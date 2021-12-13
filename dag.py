@@ -41,7 +41,7 @@ with DAG(
 #        queue="local"
 #    )
 
-    d = DummyOperator(task_id='test_op_1', owner='test')
+    d = DummyOperator(task_id='test_op_1', owner='test', queue='local')
 
 #    deleteBlob = WasbDeleteBlobOperator(
 #        task_id='deleteBlob',
