@@ -36,14 +36,16 @@ with DAG(
         opcua_numvalues=10,
         upload_format="json",
         s3_key="opc_file.json",
-        replace=True
+        replace=True,
+        queue="default"
     )
 
     deleteBlob = WasbDeleteBlobOperator(
         task_id='deleteBlob',
         wasb_conn_id="wasb",
         container_name='test',
-        blob_name='opc_data.json'
+        blob_name='opc_data.json',
+        ignore_if_missing=True
     )
 
     opWasb = OPCUAToWasbOperator(
@@ -56,7 +58,8 @@ with DAG(
         upload_format="json",
         opcua_startdate="2021-12-09 20:00:00",
         opcua_enddate="2021-12-09 20:01:00",
-        opcua_numvalues=10
+        opcua_numvalues=10,
+        queue="default"
     )
 
     deleteBlob >> opWasb
