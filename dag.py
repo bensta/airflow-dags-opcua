@@ -7,6 +7,7 @@ from providers.airlaunch.opcua.transfers.opcua_to_wasb import OPCUAToWasbOperato
 
 from airflow.providers.microsoft.azure.operators.wasb_delete_blob import WasbDeleteBlobOperator
 from airflow.operators.bash import BashOperator
+from airflow.operators.dummy import DummyOperator
 
 default_args = {
     'owner': 'airflow',
@@ -40,11 +41,7 @@ with DAG(
 #        queue="local"
 #    )
 
-    helloLocal = BashOperator(
-        task_id='hello',
-        bash_command="echo 'hello local'",
-        queue='local'
-    )
+    d = DummyOperator(task_id='test_op_1', owner='test')
 
 #    deleteBlob = WasbDeleteBlobOperator(
 #        task_id='deleteBlob',
