@@ -4,4 +4,4 @@ connections.yaml
 dags/__pycache__
 __pycache__
 workspace.*
-ad_home/
+af_home/
