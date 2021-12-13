@@ -41,11 +41,16 @@ with DAG(
 #        queue="local"
 #    )
 
-    d = DummyOperator(task_id='test_op_1', owner='test')
-    run_this = BashOperator(
-        task_id='run_after_loop',
-        bash_command='echo 1',
-        queue='local')
+    sleep_remote = BashOperator(
+        task_id='sleep_remote',
+        bash_command='sleep 300'
+    )
+
+    sleep_local = BashOperator(
+        task_id='sleep_local',
+        bash_command='sleep 300',
+        queue='local'
+    )
 
 #    deleteBlob = WasbDeleteBlobOperator(
 #        task_id='deleteBlob',
