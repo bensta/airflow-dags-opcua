@@ -1,0 +1,7 @@
+connections.yaml
+.env
+.vscode/
+dags/__pycache__
+__pycache__
+workspace.*
+ad_home/
