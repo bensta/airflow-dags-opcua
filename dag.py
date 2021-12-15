@@ -27,13 +27,13 @@ with DAG(
     catchup=False,
 ) as dag:
 
-    #deleteBlob = WasbDeleteBlobOperator(
-    #    task_id='deleteBlob',
-    #    wasb_conn_id="wasb",
-    #    container_name='test',
-    #    blob_name='opc_data.json',
-    #    ignore_if_missing=True
-    #)
+    deleteBlob = WasbDeleteBlobOperator(
+        task_id='deleteBlob',
+        wasb_conn_id="wasb",
+        container_name='test',
+        blob_name='opc_data.json',
+        ignore_if_missing=True
+    )
 
     opWasb = OPCUAToWasbOperator(
         task_id = "opcWasb",
@@ -49,7 +49,7 @@ with DAG(
         queue="local",
     )
 
-    #deleteBlob >> opWasb
+    deleteBlob >> opWasb
 
 
     
