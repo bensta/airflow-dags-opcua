@@ -74,6 +74,7 @@ with DAG(
         queue="local",
     )
 
+    deleteBlob >> opWasb
 
 
     
