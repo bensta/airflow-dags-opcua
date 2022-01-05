@@ -68,7 +68,7 @@ with DAG(
         queue='local'
     )
 
-    [deleteBlob,deleteLocalBlob] >> [opWasb, opLocal]
+    deleteBlob >> deleteLocalBlob >> opWasb >> opLocal
 
 
     
