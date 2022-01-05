@@ -6,6 +6,8 @@ from providers.airlaunch.opcua.transfers.opcua_to_s3 import OPCUAToS3Operator
 from providers.airlaunch.opcua.transfers.opcua_to_wasb import OPCUAToWasbOperator
 
 from airflow.providers.microsoft.azure.operators.wasb_delete_blob import WasbDeleteBlobOperator
+from airflow.providers.microsoft.azure.transfers.local_to_wasb import LocalFilesystemToWasbOperator
+
 from airflow.operators.bash import BashOperator
 from airflow.operators.dummy import DummyOperator
 
@@ -34,6 +36,14 @@ with DAG(
         blob_name='opc_data.json',
         ignore_if_missing=True
     )
+    
+    deleteLocalBlob = WasbDeleteBlobOperator(
+        task_id='deleteLocalBlob',
+        wasb_conn_id="wasb",
+        container_name='test',
+        blob_name='local_file.csv',
+        ignore_if_missing=True
+    )
 
     opWasb = OPCUAToWasbOperator(
         task_id = "opcWasb",
@@ -48,8 +58,17 @@ with DAG(
         opcua_numvalues=10,
         queue="local",
     )
+    
+    opLocal = LocalFilesystemToWasbOperator(
+        task_id='upload_local',
+        file_path="/opt/airflow/local_file.csv",
+        wasb_conn_id="wasb",
+        blob_name='local_file.csv',
+        container_name='test',
+        queue='local'
+    )
 
-    deleteBlob >> opWasb
+    [deleteBlob,deleteLocalBlob] >> [opWasb, opLocal]
 
 
     
