@@ -44,7 +44,7 @@ with DAG(
     opRemote = PythonOperator(
         task_id='cloud_op',
         python_callable=cloud_op,
-        kwargs={
+        op_kwargs={
             "wasb_conn_id": "wasb",
             "blob_name": "local_file.csv",
             "container_name": "test",
