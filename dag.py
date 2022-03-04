@@ -11,6 +11,7 @@ from airflow.operators.python import PythonOperator
 def cloud_op(wasb_conn_id: str, blob_name: str, container_name: str):
     wasb_hook = WasbHook(wasb_conn_id=wasb_conn_id)
     file_content = wasb_hook.read_file(container_name=container_name, blob_name=blob_name)
+    print(file_content)
 
 
 
