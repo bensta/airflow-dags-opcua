@@ -11,7 +11,7 @@ from airflow.operators.python import PythonOperator
 def cloud_op(wasb_conn_id: str, blob_name: str, container_name: str):
     wasb_hook = WasbHook(wasb_conn_id=wasb_conn_id)
     file_content = wasb_hook.read_file(container_name=container_name, blob_name=blob_name)
-    
+
 
 
 default_args = {
@@ -43,7 +43,7 @@ with DAG(
 
     opRemote = PythonOperator(
         task_id='cloud_op',
-        callable=cloud_op,
+        python_callable=cloud_op,
         kwargs={
             "wasb_conn_id": "wasb",
             "blob_name": "local_file.csv",
