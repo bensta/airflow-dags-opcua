@@ -2,14 +2,17 @@ from datetime import datetime, timedelta
 
 from airflow import DAG
 
-from providers.airlaunch.opcua.transfers.opcua_to_s3 import OPCUAToS3Operator
-from providers.airlaunch.opcua.transfers.opcua_to_wasb import OPCUAToWasbOperator
-
 from airflow.providers.microsoft.azure.operators.wasb_delete_blob import WasbDeleteBlobOperator
+from airflow.providers.microsoft.azure.hooks.wasb import WasbHook
 from airflow.providers.microsoft.azure.transfers.local_to_wasb import LocalFilesystemToWasbOperator
 
-from airflow.operators.bash import BashOperator
-from airflow.operators.dummy import DummyOperator
+from airflow.operators.python import PythonOperator
+
+def cloud_op(wasb_conn_id: str, blob_name: str, container_name: str):
+    wasb_hook = WasbHook(wasb_conn_id=wasb_conn_id)
+    file_content = wasb_hook.read_file(container_name=container_name, blob_name=blob_name)
+    
+
 
 default_args = {
     'owner': 'airflow',
@@ -29,12 +32,23 @@ with DAG(
     catchup=False,
 ) as dag:
 
-    deleteBlob = WasbDeleteBlobOperator(
-        task_id='deleteBlob',
+    opLocal = LocalFilesystemToWasbOperator(
+        task_id='upload_local',
+        file_path="/opt/airflow/local_file.csv",
         wasb_conn_id="wasb",
+        blob_name='local_file.csv',
         container_name='test',
-        blob_name='opc_data.json',
-        ignore_if_missing=True
+        queue='local'
+    )
+
+    opRemote = PythonOperator(
+        task_id='cloud_op',
+        callable=cloud_op,
+        kwargs={
+            "wasb_conn_id": "wasb",
+            "blob_name": "local_file.csv",
+            "container_name": "test",
+        }
     )
     
     deleteLocalBlob = WasbDeleteBlobOperator(
@@ -45,30 +59,7 @@ with DAG(
         ignore_if_missing=True
     )
 
-    opWasb = OPCUAToWasbOperator(
-        task_id = "opcWasb",
-        opcua_conn_id="opc",
-        opcua_node="ns=3;i=1003",
-        wasb_container="test",
-        wasb_blob="opc_data.json",
-        wasb_conn_id="wasb",
-        upload_format="json",
-        opcua_startdate="2021-12-09 20:00:00",
-        opcua_enddate="2021-12-09 20:01:00",
-        opcua_numvalues=10,
-        queue="local",
-    )
-    
-    opLocal = LocalFilesystemToWasbOperator(
-        task_id='upload_local',
-        file_path="/opt/airflow/local_file.csv",
-        wasb_conn_id="wasb",
-        blob_name='local_file.csv',
-        container_name='test',
-        queue='local'
-    )
-
-    deleteBlob >> deleteLocalBlob >> opWasb >> opLocal
+    deleteLocalBlob >> opLocal >> opRemote
 
 
     

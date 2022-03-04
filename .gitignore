@@ -5,3 +5,7 @@ dags/__pycache__
 __pycache__
 workspace.*
 af_home/
+
+providers/
+venv/
+airflow-home/

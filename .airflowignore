@@ -1,2 +1,7 @@
+# default .airflowignore file making sure the scheduler ignores the venv and airflow home folder. 
+# The Airflow Scheduler gets confused sometines if it processes the airflow-home folder
+airflow-home/
 venv/
-af_home/
+
+# You can add your own ignore clauses below
+
